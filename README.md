@@ -1,4 +1,4 @@
-# weimob
+# mock
 
 > My groovy Nuxt.js project
 
