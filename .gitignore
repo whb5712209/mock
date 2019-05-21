@@ -84,3 +84,6 @@ dist
 sw.*
 data
 public
+
+yarn.lock
+package-lock.json
