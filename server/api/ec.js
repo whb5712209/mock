@@ -13,7 +13,6 @@ ec.post('/*', (req, res) => {
       encoding: 'utf8'
     })
     parseString(data, (err, result) => {
-      console.dir(result);
       if (err) {
         res.send(err)
       }
@@ -53,18 +52,69 @@ module.exports = ec
 
 function onFormat(result, params) {
   const query = result.param.query
-  let value = null
-  let defaultConfig = null
+  const config = {}
+  let defaultConfig = {}
+  let sort = 0
   query.forEach(item => {
+    sort = 0
     if (!item.property) {
       defaultConfig = item.$
+      config[0] = item.$
+      return true
     } else {
       const list = item.property.map(i => i.$)
-      const _val = list.every(i => i.value == params[i.name] || i.value == '*')
+      sort = list.length
+      const _val = list.every(i => {
+        i.value = onFormatByJS(i.value, i.type)
+        if (i.type === 'Object') {
+          Object.keys(i.value).forEach(j => {
+            if (i.value[j] == params[i.name][j]) {
+              sort += 2;
+            }
+            if (i.value[j] == '*') {
+              sort++;
+            }
+          })
+
+        }
+        if (i.value == params[i.name]) {
+          sort += 2;
+        }
+        if (i.value == '*') {
+          sort++;
+        }
+        return i.value == params[i.name] || i.value == '*'
+      })
       if (_val) {
         value = item.$
+        config[sort] = item.$
+        return true
       }
     }
+    return false
   })
-  return value ? value : defaultConfig
+  const sortList = Object.keys(config).map(item => item * 1)
+  const maxSort = Math.max.apply(null, sortList)
+
+  if (maxSort) {
+    return config[maxSort]
+  }
+  return defaultConfig
+}
+function onFormatByJS(source, format = 'String') {
+  if (format === 'String') {
+    return source + ''
+  }
+  if (format === 'Number') {
+    return source * 1
+  }
+  if (format === 'Boolean') {
+    return source === 'true' || source === 'True' || source === 'TRUE'
+  }
+  if (format === 'Object') {
+    return JSON.parse(source)
+  }
+  if (format === 'Array') {
+    return JSON.parse(source)
+  }
 }
