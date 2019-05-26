@@ -2,7 +2,6 @@ const express = require('express')
 const fs = require('fs')
 const path = require('path')
 const dataPath = path.join(__dirname, '../../', 'data')
-const xml2js = require('xml2js');
 const parseString = require('xml2js').parseString;
 const ec = express()
 ec.post('/*', (req, res) => {
@@ -75,7 +74,7 @@ function onFormat(result, params) {
               sort++;
             }
           })
-
+          return Object.keys(i.value).some(j => (i.value[j] == '*' || i.value[j] == params[i.name][j]))
         }
         if (i.value == params[i.name]) {
           sort += 2;
