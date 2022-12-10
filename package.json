@@ -18,7 +18,7 @@
     "body-parser": "^1.19.0",
     "cross-env": "^5.2.0",
     "element-ui": "^2.4.11",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "nuxt": "^2.4.0",
     "xml2js": "^0.4.19"
   },
